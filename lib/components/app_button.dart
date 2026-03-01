@@ -13,6 +13,11 @@ class AppButton extends StatelessWidget {
   final Border? border;
   final List<BoxShadow>? boxShadow;
   final AlignmentGeometry? alignment;
+
+  // NEW
+  final Widget? icon;
+  final double spacing;
+
   const AppButton({
     this.bgColor = primaryColor,
     this.txtColor = whiteColor,
@@ -23,7 +28,10 @@ class AppButton extends StatelessWidget {
     this.border,
     this.alignment,
     this.boxShadow,
-    super.key});
+    this.icon,
+    this.spacing = 8,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +41,24 @@ class AppButton extends StatelessWidget {
         bgColor: bgColor,
         padding: padding,
         borderRadius: borderRadius ?? BorderRadius.circular(8),
-        alignment: alignment,
+        alignment: alignment ?? Alignment.center,
         border: border,
         boxShadow: boxShadow,
-        child: AppTextRegular(text: txt, color: txtColor,),
-      ));
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            if (icon != null) ...[
+              icon!,
+              SizedBox(width: spacing),
+            ],
+            AppTextRegular(
+              text: txt,
+              color: txtColor,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
