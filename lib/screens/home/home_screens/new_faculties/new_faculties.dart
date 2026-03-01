@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iu_auditor_admin/app_theme/colors.dart';
 import 'package:iu_auditor_admin/components/app_button.dart';
+import 'package:iu_auditor_admin/components/app_container.dart';
+import 'package:iu_auditor_admin/components/app_text.dart';
 import 'package:iu_auditor_admin/components/home_components/home_app_bar.dart';
 import 'package:iu_auditor_admin/components/home_components/screen_search_bar.dart';
 import 'package:iu_auditor_admin/components/home_components/screen_table/screen_table.dart';
@@ -17,57 +19,98 @@ class NewFaculties extends StatelessWidget {
     final tableController = Get.put(ScreenTableController());
 
     final screenWidth = MediaQuery.of(context).size.width;
-
-    // Define breakpoints
     bool isMobile = screenWidth < 600;
 
     return Scaffold(
-      appBar: appBar(context, title: "New Faculty"),
+      backgroundColor: bgColor,
+      appBar: appBar(context, title: "Manage New Teachers"),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: isMobile ? 16 : 25,
-          vertical: isMobile ? 25 : 50,
+          vertical: 25,
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Button row
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppTextBold(text: "New Teachers (Auditees)", fontSize: 22),
+                    AppTextRegular(
+                      text:
+                          "Manage new faculty members scheduled for auditing.",
+                      color: descriptiveColor,
+                    ),
+                  ],
+                ),
                 AppButton(
                   onPress: () {},
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 10 : 15,
-                    vertical: isMobile ? 5 : 10,
-                  ),
-                  icon: Icon(
-                    Icons.add,
-                    fontWeight: FontWeight.w400,
-                    color: whiteColor,
-                    size: isMobile ? 16 : 20,
-                  ),
-                  txt: "Add New Faculty",
-                  txtColor: whiteColor,
+                  icon: const Icon(Icons.add, color: whiteColor, size: 20),
+                  txt: "Add New Teacher",
                 ),
               ],
             ),
-            SizedBox(height: isMobile ? 15 : 25),
+            const SizedBox(height: 25),
 
-            // Search bar
-            Align(
-              alignment: Alignment.centerLeft,
-              child: ScreenSearchBar(
-                searchFieldController: controller.searchControler,
-                searchFieldDummyText: "Search by name or department...",
+            AppContainer(
+              padding: const EdgeInsets.all(16),
+              borderRadius: BorderRadius.circular(8),
+              bgColor: const Color(0xFFFFFBEB),
+              border: Border.all(color: Colors.orange.shade200),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.shield_outlined,
+                    color: Colors.brown,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppTextBold(
+                          text: "No Portal Access",
+                          color: Colors.brown,
+                          fontSize: 14,
+                        ),
+                        AppTextRegular(
+                          text:
+                              "Teachers added here are for auditing purposes only. They will NOT receive login credentials and cannot access this portal.",
+                          color: Colors.brown.shade400,
+                          fontSize: 12,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: isMobile ? 20 : 35),
+            const SizedBox(height: 25),
 
-            // Table
-            ScreenTable(
-              columns: controller.col,
-              controller: tableController,
+            ScreenSearchBar(
+              searchFieldController: controller.searchControler,
+              searchFieldDummyText: "Search by name or department...",
             ),
+            const SizedBox(height: 25),
+
+            Obx(() {
+              if (controller.col.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return AppContainer(
+                bgColor: whiteColor,
+                borderRadius: BorderRadius.circular(12),
+                child: ScreenTable(
+                  columns: controller.col,
+                  data: controller.faculties,
+                  controller: tableController,
+                ),
+              );
+            }),
           ],
         ),
       ),
