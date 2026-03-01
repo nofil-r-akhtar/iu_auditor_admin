@@ -15,7 +15,6 @@ class NewFaculties extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 1. Initialize controllers
     final controller = Get.put(NewFacultiesController());
     final tableController = Get.put(ScreenTableController());
 
@@ -33,7 +32,6 @@ class NewFaculties extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -57,7 +55,6 @@ class NewFaculties extends StatelessWidget {
             ),
             const SizedBox(height: 25),
 
-            // Warning Banner
             AppContainer(
               padding: const EdgeInsets.all(16),
               borderRadius: BorderRadius.circular(8),
@@ -94,16 +91,13 @@ class NewFaculties extends StatelessWidget {
             ),
             const SizedBox(height: 25),
 
-            // Search Bar
             ScreenSearchBar(
               searchFieldController: controller.searchControler,
               searchFieldDummyText: "Search by name or department...",
             ),
             const SizedBox(height: 25),
 
-            // Data Table with Obx reactivity
             Obx(() {
-              // Ensure columns are initialized before rendering
               if (controller.col.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }

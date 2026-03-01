@@ -21,7 +21,6 @@ class DashboardView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// 1. Top Stats Cards Row
             LayoutBuilder(
               builder: (context, constraints) {
                 return Wrap(

@@ -9,10 +9,8 @@ import 'package:iu_auditor_admin/modal_class/table/table_model.dart';
 class NewFacultiesController extends GetxController {
   final TextEditingController searchControler = TextEditingController();
 
-  // Observable list of columns to trigger UI refresh
   RxList<TableColumnModel> col = <TableColumnModel>[].obs;
 
-  // Observable dummy data
   RxList<Map<String, dynamic>> faculties = <Map<String, dynamic>>[
     {
       "name": "Mr. Ali Khan",
@@ -51,12 +49,10 @@ class NewFacultiesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Populate columns immediately on initialization
     _initializeColumns();
   }
 
   void _initializeColumns() {
-    // Using .assignAll to safely update the RxList
     col.assignAll([
       TableColumnModel(
         title: "Name / Email",
@@ -131,7 +127,7 @@ class NewFacultiesController extends GetxController {
 
   @override
   void onClose() {
-    searchControler.dispose(); // Cleanup controllers
+    searchControler.dispose();
     super.onClose();
   }
 }
