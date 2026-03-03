@@ -17,11 +17,13 @@ class AuthBox extends StatelessWidget {
   final String? headerTxt;
   final String? descriptionTxt;
   final Widget? components;
+  final VoidCallback? onPress;
   const AuthBox({
     this.isFrom = Auth.forgotPassword,
     this.headerTxt,
     this.descriptionTxt,
     this.components,
+    this.onPress,
     super.key});
 
   @override
@@ -82,24 +84,22 @@ class AuthBox extends StatelessWidget {
                   AppButton(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     txt: isFrom == Auth.forgotPassword || isFrom == Auth.resetPassword ? "Next" : isFrom == Auth.otp ? "Verify" : "Sign in",
-                    onPress: () {
-                      if (isFrom == Auth.forgotPassword) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(builder: (context) => const OtpView()),
-                        );
-                      } else if (isFrom == Auth.otp) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute<void>(builder: (context) => const ResetPassword()),
-                        );
-                      } else if (isFrom == Auth.resetPassword) {
-                        Navigator.pushReplacement(context, MaterialPageRoute<void>(builder: (context) => const Login()));
-                      }
-                      else {
-                        Navigator.pushReplacement(context, MaterialPageRoute<void>(builder: (context) => const HomeView()));
-                      }
-                    },
+                    onPress: onPress ?? () {
+                    // default navigation fallback (non-login screens)
+                    if (isFrom == Auth.forgotPassword) {
+                      Navigator.push(context,
+                          MaterialPageRoute<void>(builder: (_) => const OtpView()));
+                    } else if (isFrom == Auth.otp) {
+                      Navigator.push(context,
+                          MaterialPageRoute<void>(builder: (_) => const ResetPassword()));
+                    } else if (isFrom == Auth.resetPassword) {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute<void>(builder: (_) => const Login()));
+                    } else {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute<void>(builder: (_) => const HomeView()));
+                    }
+                  },
                     alignment: Alignment.center,
                   ),
                   Visibility(

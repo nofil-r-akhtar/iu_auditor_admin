@@ -17,8 +17,6 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       theme: AppTheme.lightTheme(),
       debugShowCheckedModeBanner: false,
-      // initialRoute: "/",
-      // getPages: AppRoutes().page,
       home: Login(),
     );
   }

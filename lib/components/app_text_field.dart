@@ -27,6 +27,8 @@ class AppTextField extends StatelessWidget {
   final int? minLine;
   final int? maxLine;
   final Function()? onTap;
+  final bool isError;
+  final String? errorText;
   const AppTextField({
   this.prefixIcon,
       this.suffixIcon,
@@ -63,49 +65,81 @@ class AppTextField extends StatelessWidget {
       this.minLine,
       this.maxLine,
       this.onTap,
+      this.isError = false,       // <-- new
+      this.errorText,
       super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AppContainer(
-      bgColor: backgroundColor,
-      padding: EdgeInsets.symmetric(horizontal: 8),
+    final errorBorder = OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      alignment: Alignment.topCenter,
-      child: TextFormField(
-        maxLines: (minLine ?? 1) > 1 ? null : 1,
-        onTap: onTap,
-        minLines: minLine,
-        controller: textController,
-        keyboardType: keyboardType,
-        textInputAction: submitLabel,
-        enabled: isTextFieldEnabled,
-        obscureText: obscureText,
-        style: TextStyle(
-            fontSize: fontSize,
-            height: 1.5,
-            fontFamily: fontFamily.toString(),
-            fontWeight: FontWeight.w400,
-            color: primaryColor),
-        cursorColor: placeholderColor,
-        onChanged: onChanged,
-        onTapOutside: (event) => FocusScope.of(context).unfocus(),
-        onFieldSubmitted: onFieldSubmitted,
-        decoration: InputDecoration(
-          border: outlineBorder,
-          focusedBorder: focusedBorder,
-          enabledBorder: enabledBorder,
-          // labelText: placeholder,
-          // labelStyle: TextStyle(fontSize: 14, color: placeholderColor, fontWeight: FontWeight.w400, fontFamily: fontFamily.toString()),
-          // hintStyle: TextStyle(color: placeholderColor),
-          hintText: placeholder,
-          hintStyle: TextStyle(color: placeholderColor),
-          prefixIcon: prefixIcon,
-          suffixIcon: suffixIcon,
+      borderSide: const BorderSide(color: Colors.red, width: 1.2),
+    );
+    final normalBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide.none,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppContainer(
+          bgColor: isError
+                  ? Colors.red.withValues(alpha: 0.06)   // subtle red tint on error
+                  : backgroundColor,
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          borderRadius: BorderRadius.circular(12),
+          alignment: Alignment.topCenter,
+          child: TextFormField(
+            maxLines: (minLine ?? 1) > 1 ? null : 1,
+            onTap: onTap,
+            minLines: minLine,
+            controller: textController,
+            keyboardType: keyboardType,
+            textInputAction: submitLabel,
+            enabled: isTextFieldEnabled,
+            obscureText: obscureText,
+            style: TextStyle(
+                fontSize: fontSize,
+                height: 1.5,
+                fontFamily: fontFamily.toString(),
+                fontWeight: FontWeight.w400,
+                color: primaryColor),
+            cursorColor: placeholderColor,
+            onChanged: onChanged,
+            onTapOutside: (event) => FocusScope.of(context).unfocus(),
+            onFieldSubmitted: onFieldSubmitted,
+            decoration: InputDecoration(
+               border: isError ? errorBorder : normalBorder,
+              focusedBorder: isError ? errorBorder : normalBorder,
+              enabledBorder: isError ? errorBorder : normalBorder,
+              errorBorder: errorBorder,
+              focusedErrorBorder: errorBorder,
+              // labelText: placeholder,
+              // labelStyle: TextStyle(fontSize: 14, color: placeholderColor, fontWeight: FontWeight.w400, fontFamily: fontFamily.toString()),
+              // hintStyle: TextStyle(color: placeholderColor),
+              hintText: placeholder,
+              hintStyle: TextStyle(color: placeholderColor),
+              prefixIcon: prefixIcon,
+              suffixIcon: suffixIcon,
+              errorStyle: const TextStyle(height: 0, fontSize: 0),
+            ),
+            validator: validator ?? (_) => 'TextField is not Empty',
+            textAlignVertical: TextAlignVertical.center,
+          ),
         ),
-        validator: validator ?? (_) => 'TextField is not Empty',
-        textAlignVertical: TextAlignVertical.center,
-      ),
+        if (isError && errorText != null && errorText!.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 4),
+            child: Text(
+              errorText!,
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 11,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+      ],
     ); 
   }
 }
