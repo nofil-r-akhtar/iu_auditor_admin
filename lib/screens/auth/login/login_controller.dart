@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iu_auditor_admin/apis/auth/auth_api.dart';
+import 'package:iu_auditor_admin/main.dart';
 import 'package:iu_auditor_admin/screens/home/home.dart';
 
 class LoginController extends GetxController{
+  Auth authapi = Auth();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final form = GlobalKey<FormState>();
@@ -50,24 +53,37 @@ class LoginController extends GetxController{
 
   /// Login Function
   Future<void> login() async {
-    if (!validateFields()) return;
+  if (!validateFields()) return;
 
-    try {
-      isLoading.value = true;
+  try {
+    isLoading.value = true;
 
-      await Future.delayed(const Duration(seconds: 2)); // replace with API call
+    final response = await authapi.login(
+      email: emailController.text,
+      password: passwordController.text,
+    );
 
-      Get.snackbar("Success", "Login Successful");
-      Navigator.pushReplacement(
-        Get.context!,
-        MaterialPageRoute(builder: (_) => const HomeView()),
-      );
-    } catch (e) {
-      Get.snackbar("Error", "Something went wrong");
-    } finally {
-      isLoading.value = false;
+    // ── Failure: API returned success = false ──
+    if (response['success'].toString() == 'false') {
+      Get.snackbar("Error", response['message'] ?? "Login failed");
+      return;
     }
+
+    // ── Success: store token and navigate ──
+    // final String token = response['access_token'];
+    // ApiRequest.setAuthToken(token);   // sets Bearer token for future requests
+
+    navigatorKey.currentState?.pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomeView()),
+    );
+
+  } catch (e) {
+    debugPrint('Login error: $e');
+    Get.snackbar("Error", e.toString());
+  } finally {
+    isLoading.value = false;
   }
+}
 
   @override
   void onClose() {

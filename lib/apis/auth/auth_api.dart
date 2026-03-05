@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:iu_auditor_admin/apis/api_request.dart';
 import 'package:iu_auditor_admin/apis/apis_end_points.dart';
 import 'package:iu_auditor_admin/const/enums.dart';
@@ -12,6 +13,7 @@ class Auth {
     required String password,
   }) async {
     try {
+      
       final response = await request.makeRequest(
         url: api.login,
         method: Request.post,
@@ -20,6 +22,7 @@ class Auth {
           'password': password,
         },
       );
+      debugPrint("API Executed");
       return response;
     } catch (e) {
       throw Exception('Login failed: $e');
@@ -53,7 +56,7 @@ class Auth {
         method: Request.post,
         params: {
           'email': email,
-          'otp': otp,
+          'otp_code': otp,
         },
       );
       return response;
@@ -90,7 +93,7 @@ class Auth {
         method: Request.post,
         params: {
           'email': email,
-          'otp': otp,
+          'otp_code': otp,
           'new_password': newPassword,
         },
       );

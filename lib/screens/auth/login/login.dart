@@ -28,7 +28,7 @@ class Login extends StatelessWidget {
             child: AuthBox(
               isFrom: Auth.login,
               headerTxt: "Login",
-              onPress: controller.login,
+              onPress: () => controller.login(),
               descriptionTxt: "Enter your credentials to access the panel.",
               components: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

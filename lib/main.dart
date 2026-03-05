@@ -5,6 +5,8 @@ import 'package:iu_auditor_admin/app_theme/theme.dart';
 import 'package:iu_auditor_admin/screens/auth/login/login.dart';
 // import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() {
   runApp(const MyApp());
 }
@@ -15,6 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      navigatorKey: navigatorKey,
       theme: AppTheme.lightTheme(),
       debugShowCheckedModeBanner: false,
       home: Login(),

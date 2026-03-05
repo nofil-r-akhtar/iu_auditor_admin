@@ -11,20 +11,23 @@ import 'package:iu_auditor_admin/const/enums.dart';
 import 'package:iu_auditor_admin/screens/auth/reset_password/reset_password_controller.dart';
 
 class ResetPassword extends StatelessWidget {
-  const ResetPassword({super.key});
+  final String email;
+  final String otp;
+  const ResetPassword({required this.email, required this.otp, super.key});
 
   @override
   Widget build(BuildContext context) {
     final ResetPasswordController controller = Get.put(ResetPasswordController());
+    controller.email = email;   // <-- pass email
+    controller.otp = otp;       // <-- pass otp
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          }, icon: Icon(
-            Icons.arrow_back
-          )),
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back),
+        ),
       ),
       body: SafeArea(
         child: Center(
@@ -32,11 +35,12 @@ class ResetPassword extends StatelessWidget {
             headerTxt: "Reset your Password",
             descriptionTxt: "Please enter your new password and confirm it to continue.",
             isFrom: Auth.resetPassword,
+            onPress: () => controller.resetPassword(),   // <-- hook up button
             components: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                AppTextSemiBold(text: "New Password"),
+                const AppTextSemiBold(text: "New Password"),
                 const SizedBox(height: 3),
                 Obx(() => AppTextField(
                       textController: controller.newPasswordController,
@@ -51,16 +55,15 @@ class ResetPassword extends StatelessWidget {
                         icon: controller.isNewPasswordHidden.value
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        onPressed: () {
-                          controller.isNewPasswordHidden.toggle();
-                        },
+                        onPressed: () => controller.isNewPasswordHidden.toggle(),
                       ),
                       placeholder: "••••••••",
                       placeholderColor: hintTextColor,
-                      
-                )),
+                      isError: controller.newPasswordError.value.isNotEmpty,
+                      errorText: controller.newPasswordError.value,
+                    )),
                 const SizedBox(height: 25),
-                AppTextSemiBold(text: "Confirm New Password"),
+                const AppTextSemiBold(text: "Confirm New Password"),
                 const SizedBox(height: 3),
                 Obx(() => AppTextField(
                       textController: controller.confimrNewPasswordController,
@@ -75,18 +78,17 @@ class ResetPassword extends StatelessWidget {
                         icon: controller.isConfirmNewPasswordHidden.value
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        onPressed: () {
-                          controller.isConfirmNewPasswordHidden.toggle();
-                        },
+                        onPressed: () => controller.isConfirmNewPasswordHidden.toggle(),
                       ),
                       placeholder: "••••••••",
                       placeholderColor: hintTextColor,
-                      
-                )),
+                      isError: controller.confirmPasswordError.value.isNotEmpty,
+                      errorText: controller.confirmPasswordError.value,
+                    )),
                 const SizedBox(height: 20),
               ],
             ),
-          )
+          ),
         ),
       ),
     );

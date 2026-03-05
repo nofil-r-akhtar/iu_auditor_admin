@@ -6,20 +6,21 @@ import 'package:iu_auditor_admin/const/enums.dart';
 import 'package:iu_auditor_admin/screens/auth/otp/otp_controller.dart';
 
 class OtpView extends StatelessWidget {
-  const OtpView({super.key});
+  final String email;
+  const OtpView({required this.email, super.key});
 
   @override
   Widget build(BuildContext context) {
     final OtpController controller = Get.put(OtpController());
+    controller.email = email;   // pass email to controller
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          }, icon: Icon(
-            Icons.arrow_back
-          )),
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back),
+        ),
       ),
       body: SafeArea(
         child: Center(
@@ -27,55 +28,35 @@ class OtpView extends StatelessWidget {
             isFrom: Auth.otp,
             headerTxt: "OTP Verification",
             descriptionTxt: "Please enter the verification code sent to your registered email to continue.",
+            onPress: () => controller.verifyOtp(),
+            onResend: () => controller.resendOtp(),         // <-- resend callback
+            resendEnabled: controller.isResendEnabled,      // <-- reactive bool
+            secondsRemaining: controller.secondsRemaining,  // <-- countdown
             components: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 40),
-                AppOtpField(
-                  controller: controller.otpController,
-                  onChanged: (value) {
-                    debugPrint("Value of the otp code: $value");
-                  },
-                ),
-                // AppTextSemiBold(text: "Email"),
-                // const SizedBox(height: 15),
-                // AppTextField(textController: controller.emailController, prefixIcon: AppSvg(assetPath: user, height: 10, width: 10, fit: BoxFit.scaleDown,), placeholder: "admin@iqra.edu.pk", placeholderColor: hintTextColor,),
+                Obx(() => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppOtpField(
+                      controller: controller.otpController,
+                      onChanged: (_) => controller.otpError.value = '',
+                    ),
+                    if (controller.otpError.value.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6, left: 4),
+                        child: Text(
+                          controller.otpError.value,
+                          style: const TextStyle(color: Colors.red, fontSize: 11),
+                        ),
+                      ),
+                  ],
+                )),
                 const SizedBox(height: 80),
-                // AppTextSemiBold(text: "Password"),
-                // const SizedBox(height: 1),
-                // Obx(() => AppTextField(
-                //       textController: controller.passwordController,
-                //       obscureText: controller.isPasswordHidden.value,
-                //       prefixIcon: AppSvg(
-                //         assetPath: lock,
-                //         height: 10,
-                //         width: 10,
-                //         fit: BoxFit.scaleDown,
-                //       ),
-                //       suffixIcon: AppIconButton(
-                //         icon: controller.isPasswordHidden.value
-                //             ? Icons.visibility_off
-                //             : Icons.visibility,
-                //         onPressed: () {
-                //           controller.isPasswordHidden.toggle();
-                //         },
-                //       ),
-                //       placeholder: "••••••••",
-                //       placeholderColor: hintTextColor,
-                      
-                // )),
-                // AppTextField(textController: controller.passwordController, prefixIcon: AppSvg(assetPath: lock, height: 5, width: 5, fit: BoxFit.scaleDown), suffixIcon: AppIconButton(icon: , onPressed: onPressed),),
-                // const SizedBox(height: 7),
-                // Align(
-                //   alignment: AlignmentGeometry.centerRight,
-                //   child: AppTextButton(
-                //     onPressed: () => Get.to(() => const ForgotPassword()),
-                //     btnText: "Forgot Password?"),
-                // ),
-                // const SizedBox(height: 7)
               ],
             ),
-          )
+          ),
         ),
       ),
     );

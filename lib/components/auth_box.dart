@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iu_auditor_admin/app_theme/colors.dart';
 import 'package:iu_auditor_admin/components/app_button.dart';
 import 'package:iu_auditor_admin/components/app_container.dart';
@@ -7,23 +8,25 @@ import 'package:iu_auditor_admin/components/app_text.dart';
 import 'package:iu_auditor_admin/components/app_text_button.dart';
 import 'package:iu_auditor_admin/const/assets.dart';
 import 'package:iu_auditor_admin/const/enums.dart';
-import 'package:iu_auditor_admin/screens/auth/login/login.dart';
-import 'package:iu_auditor_admin/screens/auth/otp/otp_view.dart';
-import 'package:iu_auditor_admin/screens/auth/reset_password/reset_password.dart';
-import 'package:iu_auditor_admin/screens/home/home.dart';
 
 class AuthBox extends StatelessWidget {
-  final Auth isFrom;
+ final Auth isFrom;
   final String? headerTxt;
   final String? descriptionTxt;
   final Widget? components;
   final VoidCallback? onPress;
+  final VoidCallback? onResend;                  // <-- new
+  final RxBool? resendEnabled;                   // <-- new
+  final RxInt? secondsRemaining; 
   const AuthBox({
     this.isFrom = Auth.forgotPassword,
     this.headerTxt,
     this.descriptionTxt,
     this.components,
     this.onPress,
+    this.onResend,
+    this.resendEnabled,
+    this.secondsRemaining,
     super.key});
 
   @override
@@ -84,22 +87,7 @@ class AuthBox extends StatelessWidget {
                   AppButton(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     txt: isFrom == Auth.forgotPassword || isFrom == Auth.resetPassword ? "Next" : isFrom == Auth.otp ? "Verify" : "Sign in",
-                    onPress: onPress ?? () {
-                    // default navigation fallback (non-login screens)
-                    if (isFrom == Auth.forgotPassword) {
-                      Navigator.push(context,
-                          MaterialPageRoute<void>(builder: (_) => const OtpView()));
-                    } else if (isFrom == Auth.otp) {
-                      Navigator.push(context,
-                          MaterialPageRoute<void>(builder: (_) => const ResetPassword()));
-                    } else if (isFrom == Auth.resetPassword) {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute<void>(builder: (_) => const Login()));
-                    } else {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute<void>(builder: (_) => const HomeView()));
-                    }
-                  },
+                    onPress: onPress,
                     alignment: Alignment.center,
                   ),
                   Visibility(
@@ -107,8 +95,16 @@ class AuthBox extends StatelessWidget {
                     child: SizedBox(height: 5)),
                   Visibility(
                     visible: isFrom == Auth.otp,
-                    child: Center(child: AppTextButton(btnText: "Resend OTP", txtSize: 12,)))
-
+                    child: Center(child: Obx(() {
+                      final enabled = resendEnabled?.value ?? false;
+                      final seconds = secondsRemaining?.value ?? 0;
+                      return AppTextButton(
+                        btnText: enabled ? "Resend OTP" : "Resend OTP in ${seconds}s",
+                        txtSize: 12,
+                        // pass null when disabled so it looks greyed out
+                        onPressed: enabled ? onResend : null,
+                      );
+                    }),))
                 ],
               ),
             ),
