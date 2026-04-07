@@ -96,16 +96,12 @@ class Pagination extends StatelessWidget {
 
 class Header extends StatelessWidget {
   final List<TableColumnModel> columns;
-
-  const Header({
-    super.key,
-    required this.columns,
-  });
+  const Header({super.key, required this.columns});
 
   @override
   Widget build(BuildContext context) {
     return AppContainer(
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
       bgColor: bgColor,
       child: Row(
         children: columns.map((column) {
@@ -113,6 +109,7 @@ class Header extends StatelessWidget {
             child: AppTextSemiBold(
               text: column.title,
               color: navyBlueColor,
+              fontSize: 13,
             ),
           );
         }).toList(),
@@ -124,12 +121,7 @@ class Header extends StatelessWidget {
 class BuildRow extends StatelessWidget {
   final List<TableColumnModel> columns;
   final dynamic rowData;
-
-  const BuildRow({
-    super.key,
-    required this.columns,
-    required this.rowData,
-  });
+  const BuildRow({super.key, required this.columns, required this.rowData});
 
   @override
   Widget build(BuildContext context) {
@@ -137,56 +129,68 @@ class BuildRow extends StatelessWidget {
     bool isMobile = screenWidth < 600;
 
     if (isMobile) {
-      // Mobile: stacked view
-      return AppContainer(
-        padding: const EdgeInsets.all(12),
-        margin: const EdgeInsets.symmetric(vertical: 6),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: columns.map((column) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${column.title}: ",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: navyBlueColor,
-                    ),
+      return Column(
+        children: [
+          AppContainer(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            bgColor: whiteColor,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: columns.map((column) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 120,
+                        child: AppTextSemiBold(
+                          text: "${column.title}:",
+                          color: navyBlueColor,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Expanded(
+                        child: column.cellBuilder != null
+                            ? column.cellBuilder!(rowData)
+                            : AppTextRegular(
+                                text: rowData[column.title]?.toString() ?? "",
+                                color: descriptiveColor,
+                                fontSize: 12,
+                              ),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    child: column.cellBuilder != null
-                        ? column.cellBuilder!(rowData)
-                        : Text(
-                            rowData[column.title]?.toString() ?? "",
-                            style: TextStyle(color: descriptiveColor),
-                          ),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      );
-    } else {
-      // Desktop / Tablet: row view
-      return AppContainer(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Row(
-          children: columns.map((column) {
-            return Expanded(
-              child: column.cellBuilder != null
-                  ? column.cellBuilder!(rowData)
-                  : AppTextMedium(
-                      text: rowData[column.title]?.toString() ?? "",
-                      color: descriptiveColor,
-                    ),
-            );
-          }).toList(),
-        ),
+                );
+              }).toList(),
+            ),
+          ),
+          const Divider(height: 1, color: Color(0xFFEEEEEE)),
+        ],
       );
     }
+
+    return Column(
+      children: [
+        AppContainer(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          bgColor: whiteColor,
+          child: Row(
+            children: columns.map((column) {
+              return Expanded(
+                child: column.cellBuilder != null
+                    ? column.cellBuilder!(rowData)
+                    : AppTextRegular(
+                        text: rowData[column.title]?.toString() ?? "",
+                        color: descriptiveColor,
+                        fontSize: 13,
+                      ),
+              );
+            }).toList(),
+          ),
+        ),
+        const Divider(height: 1, color: Color(0xFFEEEEEE)),
+      ],
+    );
   }
 }

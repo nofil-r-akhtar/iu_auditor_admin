@@ -29,7 +29,7 @@ class ApiRequest {
       }
 
       Map<String, String> defaultHeaders = {
-        'Content-Type': 'application/json',
+        ...ApiRequest.headers,
       };
 
       if (headers != null) {
@@ -67,6 +67,13 @@ class ApiRequest {
           response = await http.delete(
             Uri.parse(ApisEndPoints.startUrl + url),
             headers: defaultHeaders,
+          );
+          break;
+        case Request.patch:
+          response = await http.patch(
+            Uri.parse(ApisEndPoints.startUrl + url),
+            headers: defaultHeaders,
+            body: jsonEncode(params),
           );
           break;
       }

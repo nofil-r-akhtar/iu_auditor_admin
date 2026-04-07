@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
+import 'package:iu_auditor_admin/apis/auth/auth_api.dart';
 import 'package:iu_auditor_admin/const/assets.dart';
+import 'package:iu_auditor_admin/modal_class/user/user_profile.dart';
 import 'package:iu_auditor_admin/screens/home/home_screens/audit_questions/audit_questions.dart';
 import 'package:iu_auditor_admin/screens/home/home_screens/audit_reviews/audit_review.dart';
 import 'package:iu_auditor_admin/screens/home/home_screens/dashboard/dashboard_view.dart';
@@ -8,7 +10,10 @@ import 'package:iu_auditor_admin/screens/home/home_screens/senior_lecturers/seni
 import 'package:iu_auditor_admin/screens/home/home_screens/user_management/user_management.dart';
 
 class HomeController extends GetxController{
+  final Auth authapi = Auth();
   var selectedIndex = 0.obs;
+  var isProfileLoading = false.obs;
+  Rxn<UserProfile> userProfile = Rxn<UserProfile>();  // null until loaded
 
   final menuItems = [
     {
@@ -48,5 +53,20 @@ class HomeController extends GetxController{
 
   void changeIndex(int index) {
     selectedIndex.value = index;
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchProfile();
+  }
+
+  Future<void> fetchProfile() async {
+    
+      isProfileLoading.value = true;
+      userProfile.value = await authapi.fetchProfile();
+    
+      isProfileLoading.value = false;
+    
   }
 }

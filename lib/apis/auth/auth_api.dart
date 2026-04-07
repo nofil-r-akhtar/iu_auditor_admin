@@ -1,19 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:iu_auditor_admin/apis/api_request.dart';
 import 'package:iu_auditor_admin/apis/apis_end_points.dart';
 import 'package:iu_auditor_admin/const/enums.dart';
+import 'package:iu_auditor_admin/modal_class/user/user_login.dart';
+import 'package:iu_auditor_admin/modal_class/user/user_profile.dart';
 
 class Auth {
 
   ApiRequest request = ApiRequest();
   ApisEndPoints api = ApisEndPoints();
 
-  Future<Map<String, dynamic>> login({
+  Future<UserLoginResponse> login({
     required String email,
     required String password,
   }) async {
-    try {
-      
       final response = await request.makeRequest(
         url: api.login,
         method: Request.post,
@@ -22,17 +21,13 @@ class Auth {
           'password': password,
         },
       );
-      debugPrint("API Executed");
-      return response;
-    } catch (e) {
-      throw Exception('Login failed: $e');
-    }
+      return UserLoginResponse.fromJson(response);  
   }
 
   Future<Map<String, dynamic>> forgetPassword({
     required String email,
   }) async {
-    try {
+
       final response = await request.makeRequest(
         url: api.forgotPassword,
         method: Request.post,
@@ -41,16 +36,14 @@ class Auth {
         },
       );
       return response;
-    } catch (e) {
-      throw Exception('Forget password failed: $e');
-    }
+   
   }
 
   Future<Map<String, dynamic>> verifyOtp({
     required String email,
     required String otp,
   }) async {
-    try {
+
       final response = await request.makeRequest(
         url: api.verifyOtp,
         method: Request.post,
@@ -60,15 +53,13 @@ class Auth {
         },
       );
       return response;
-    } catch (e) {
-      throw Exception('OTP verification failed: $e');
-    }
+ 
   }
 
   Future<Map<String, dynamic>> resendOtp({
     required String email,
   }) async {
-    try {
+
       final response = await request.makeRequest(
         url: api.resendOtp,
         method: Request.post,
@@ -77,9 +68,7 @@ class Auth {
         },
       );
       return response;
-    } catch (e) {
-      throw Exception('Resend OTP failed: $e');
-    }
+    
   }
 
   Future<Map<String, dynamic>> resetPassword({
@@ -87,7 +76,7 @@ class Auth {
     required String otp,
     required String newPassword,
   }) async {
-    try {
+
       final response = await request.makeRequest(
         url: api.changePassword,
         method: Request.post,
@@ -98,8 +87,22 @@ class Auth {
         },
       );
       return response;
-    } catch (e) {
-      throw Exception('Reset password failed: $e');
-    }
+    
+  }
+
+
+  Future<UserProfile> fetchProfile() async {
+    
+      final response = await request.makeRequest(
+        url: api.userProfile,
+        method: Request.get,
+      );
+
+      if (response['success'].toString() == 'false') {
+        throw Exception(response['message'] ?? 'Failed to fetch profile');
+      }
+
+      return UserProfile.fromJson(response['data']);
+    
   }
 }

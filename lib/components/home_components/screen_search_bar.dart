@@ -22,7 +22,7 @@ class ScreenSearchBar extends StatelessWidget {
       bgColor: whiteColor,
 
       borderRadius: BorderRadius.circular(16),
-      padding: EdgeInsets.fromLTRB(20, 15, 0, 15),
+      padding: EdgeInsets.fromLTRB(15, 8, 0, 8),
       child: Row(
         children: [
           SizedBox(

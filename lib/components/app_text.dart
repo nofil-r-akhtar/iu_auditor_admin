@@ -128,7 +128,7 @@ class AppTextSemiBold extends StatelessWidget {
       style: TextStyle(
           height: h,
           fontSize: fontSize ?? 16,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
           fontFamily: fontFamily?.name,
           inherit: false,
           color: color),

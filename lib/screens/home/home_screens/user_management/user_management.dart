@@ -20,65 +20,63 @@ class UserManagement extends StatelessWidget {
     final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
-      backgroundColor: bgColor, // Consistent silver background
-      appBar: appBar(context, title: "User Management"),
+      backgroundColor: bgColor,
+      appBar: appBar(context, title: 'User Management'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: isMobile ? 16 : 25,
-          vertical: 25, // Consistent top padding
+          vertical: 25,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Row
+            // ── Responsive header ──────────────────────────────────
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AppTextBold(text: "User Management", fontSize: 22),
-                    AppTextRegular(
-                      text: "Manage admin portal users and their permissions.",
-                      color: descriptiveColor,
-                    ),
-                  ],
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppTextBold(
+                        text: 'User Management',
+                        fontSize: isMobile ? 18 : 22,
+                      ),
+                      AppTextRegular(
+                        text: 'Manage admin portal users and their permissions.',
+                        color: descriptiveColor,
+                        fontSize: 13,
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 12),
                 AppButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   onPress: () {},
-                  icon: const Icon(Icons.add, color: whiteColor, size: 20),
-                  txt: "Add User",
+                  icon: const Icon(Icons.add, color: whiteColor, size: 18),
+                  txt: isMobile ? '' : 'Add User',
                 ),
               ],
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 20),
 
-            // RBAC Info Banner
+            // ── RBAC Info Banner ───────────────────────────────────
             AppContainer(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               borderRadius: BorderRadius.circular(8),
               bgColor: const Color(0xFFEFF6FF),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.shield_outlined,
-                    color: primaryColor,
-                    size: 22,
-                  ),
-                  const SizedBox(width: 12),
+                  const Icon(Icons.shield_outlined, color: primaryColor, size: 20),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppTextBold(
-                          text: "Role-Based Access Control",
-                          color: primaryColor,
-                          fontSize: 14,
-                        ),
+                        AppTextBold(text: 'Role-Based Access Control', color: primaryColor, fontSize: 13),
                         AppTextRegular(
-                          text:
-                              "Users can be assigned different roles with specific permissions. Super Admins have full access, while Viewers have read-only access.",
-                          color: primaryColor.withValues(alpha: 0.8),
+                          text: 'Assign roles with specific permissions. Super Admins have full access, Viewers have read-only.',
+                          color: primaryColor,
                           fontSize: 12,
                         ),
                       ],
@@ -87,20 +85,24 @@ class UserManagement extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 20),
 
-            // Search Bar
             ScreenSearchBar(
               searchFieldController: controller.searchController,
-              searchFieldDummyText: "Search by name, email, or role...",
+              searchFieldDummyText: 'Search by name, email, or role...',
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 20),
 
-            // Table
             Obx(() {
-              if (controller.col.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
+              if (controller.isLoading.value) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
               }
+              if (controller.col.isEmpty) return const SizedBox.shrink();
               return AppContainer(
                 bgColor: whiteColor,
                 borderRadius: BorderRadius.circular(12),

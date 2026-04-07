@@ -17,13 +17,11 @@ class SeniorLectueres extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(SeniorLectueresController());
     final tableController = Get.put(ScreenTableController());
-
-    final screenWidth = MediaQuery.of(context).size.width;
-    bool isMobile = screenWidth < 600;
+    final isMobile = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: appBar(context, title: "Manage Senior Lecturers"),
+      appBar: appBar(context, title: 'Manage Senior Lecturers'),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(
           horizontal: isMobile ? 16 : 25,
@@ -32,57 +30,53 @@ class SeniorLectueres extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // ── Responsive header ──────────────────────────────────
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AppTextBold(
-                      text: "Senior Lecturers (Auditors)",
-                      fontSize: 22,
-                    ),
-                    AppTextRegular(
-                      text:
-                          "Manage senior faculty members who will conduct audits.",
-                      color: descriptiveColor,
-                    ),
-                  ],
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppTextBold(
+                        text: 'Senior Lecturers (Auditors)',
+                        fontSize: isMobile ? 18 : 22,
+                      ),
+                      AppTextRegular(
+                        text: 'Manage senior faculty members who will conduct audits.',
+                        color: descriptiveColor,
+                        fontSize: 13,
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 12),
                 AppButton(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   onPress: () {},
-                  icon: const Icon(Icons.add, color: whiteColor, size: 20),
-                  txt: "Add Auditor",
+                  icon: const Icon(Icons.add, color: whiteColor, size: 18),
+                  txt: isMobile ? '' : 'Add Auditor',
                 ),
               ],
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 20),
 
+            // ── Info banner ────────────────────────────────────────
             AppContainer(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               borderRadius: BorderRadius.circular(8),
               bgColor: const Color(0xFFEFF6FF),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.school_outlined,
-                    color: primaryColor,
-                    size: 22,
-                  ),
-                  const SizedBox(width: 12),
+                  const Icon(Icons.school_outlined, color: primaryColor, size: 20),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppTextBold(
-                          text: "Auditor Access",
-                          color: primaryColor,
-                          fontSize: 14,
-                        ),
+                        AppTextBold(text: 'Auditor Access', color: primaryColor, fontSize: 13),
                         AppTextRegular(
-                          text:
-                              "Senior lecturers listed here will have access to the separate Auditor App to evaluate new teachers.",
-                          color: primaryColor.withValues(alpha: 0.8),
+                          text: 'Senior lecturers here will have access to the Auditor App to evaluate new teachers.',
+                          color: primaryColor,
                           fontSize: 12,
                         ),
                       ],
@@ -91,18 +85,24 @@ class SeniorLectueres extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 20),
 
             ScreenSearchBar(
               searchFieldController: controller.searchController,
-              searchFieldDummyText: "Search auditors...",
+              searchFieldDummyText: 'Search auditors...',
             ),
-            const SizedBox(height: 25),
+            const SizedBox(height: 20),
 
             Obx(() {
-              if (controller.col.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
+              if (controller.isLoading.value) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
               }
+              if (controller.col.isEmpty) return const SizedBox.shrink();
               return AppContainer(
                 bgColor: whiteColor,
                 borderRadius: BorderRadius.circular(12),

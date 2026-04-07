@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:iu_auditor_admin/apis/api_request.dart';
 import 'package:iu_auditor_admin/apis/auth/auth_api.dart';
 import 'package:iu_auditor_admin/main.dart';
 import 'package:iu_auditor_admin/screens/home/home.dart';
@@ -64,14 +65,15 @@ class LoginController extends GetxController{
     );
 
     // ── Failure: API returned success = false ──
-    if (response['success'].toString() == 'false') {
-      Get.snackbar("Error", response['message'] ?? "Login failed");
+    if (!response.success) {
+      Get.snackbar("Error", response.message);
       return;
     }
 
-    // ── Success: store token and navigate ──
-    // final String token = response['access_token'];
-    // ApiRequest.setAuthToken(token);   // sets Bearer token for future requests
+    if (response.data.accessToken.isNotEmpty) {
+      ApiRequest.setAuthToken(response.data.accessToken);
+      
+    } 
 
     navigatorKey.currentState?.pushReplacement(
       MaterialPageRoute(builder: (_) => const HomeView()),
