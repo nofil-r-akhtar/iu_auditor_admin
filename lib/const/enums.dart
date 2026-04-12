@@ -6,8 +6,7 @@ enum Request { get, post, put, del, patch }
 
 enum Env { dev, local }
 
-/// Teacher audit status — mirrors the `teacher_status` PostgreSQL enum exactly.
-/// Values: pending | scheduled | completed | cancelled
+/// Teacher audit status — mirrors the `teacher_status` PostgreSQL enum.
 enum TeacherStatus {
   pending('pending', 'Pending'),
   scheduled('scheduled', 'Scheduled'),
@@ -15,7 +14,6 @@ enum TeacherStatus {
   cancelled('cancelled', 'Cancelled');
 
   const TeacherStatus(this.apiValue, this.displayLabel);
-
   final String apiValue;
   final String displayLabel;
 
@@ -27,16 +25,35 @@ enum TeacherStatus {
   }
 }
 
+/// User roles — mirrors the `users_role` PostgreSQL enum.
+/// Only [seniorLecturer] is used when creating an auditor from this panel.
+enum UserRole {
+  superAdmin('super_admin', 'Super Admin'),
+  admin('admin', 'Admin'),
+  departmentHead('department_head', 'Department Head'),
+  seniorLecturer('senior_lecturer', 'Senior Lecturer');
+
+  const UserRole(this.apiValue, this.displayLabel);
+  final String apiValue;
+  final String displayLabel;
+
+  static UserRole? fromApiValue(String value) {
+    for (final r in UserRole.values) {
+      if (r.apiValue == value) return r;
+    }
+    return null;
+  }
+}
+
 /// Mirrors the Supabase `department` PostgreSQL enum exactly.
 enum Department {
   computerScience('Computer Science'),
-  businessAdministration('Business Adminstriation'), // exact DB spelling
+  businessAdministration('Business Adminstriation'),
   mediaScience('Media Science'),
   softwareEngineering('Software Engineering'),
   engineering('Engineering');
 
   const Department(this.label);
-
   final String label;
 
   static Department? fromLabel(String value) {

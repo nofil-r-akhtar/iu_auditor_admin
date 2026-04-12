@@ -10,83 +10,98 @@ import 'package:iu_auditor_admin/components/auth_box.dart';
 import 'package:iu_auditor_admin/const/assets.dart';
 import 'package:iu_auditor_admin/const/enums.dart';
 import 'package:iu_auditor_admin/screens/auth/forgot_password/forgot_password.dart';
-import 'package:iu_auditor_admin/screens/auth/login/login_controller.dart';
+import 'login_controller.dart';
 
 class Login extends StatelessWidget {
   const Login({super.key});
-  
+
   @override
   Widget build(BuildContext context) {
-    final LoginController controller = Get.put(LoginController());
+    final controller = Get.put(LoginController());
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      
       body: SafeArea(
         child: Center(
           child: Form(
             key: controller.form,
             child: AuthBox(
               isFrom: Auth.login,
-              headerTxt: "Login",
+              headerTxt: 'Login',
+              descriptionTxt: 'Enter your credentials to access the panel.',
               onPress: () => controller.login(),
-              descriptionTxt: "Enter your credentials to access the panel.",
+              isLoading: controller.isLoading, // ← pass reactive isLoading
               components: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 10),
-                  AppTextSemiBold(text: "Email"),
-                  const SizedBox(height: 3),
-                  AppTextField(textController: controller.emailController, prefixIcon: AppSvg(assetPath: user, height: 10, width: 10, fit: BoxFit.scaleDown), placeholder: "admin@iqra.edu.pk", placeholderColor: hintTextColor,isError: controller.emailError.value.isNotEmpty,
-                        errorText: controller.emailError.value,
-                        validator: (_) => controller.emailError.value.isEmpty
-                            ? null
-                            : controller.emailError.value),
-                  const SizedBox(height: 10),
-                  AppTextSemiBold(text: "Password"),
+
+                  AppTextSemiBold(text: 'Email'),
                   const SizedBox(height: 3),
                   Obx(() => AppTextField(
-                        textController: controller.passwordController,
-                        obscureText: controller.isPasswordHidden.value,
-                        prefixIcon: AppSvg(
-                          assetPath: lock,
-                          height: 10,
-                          width: 10,
-                          fit: BoxFit.scaleDown,
-                          
-                        ),
-                        suffixIcon: AppIconButton(
-                          icon: controller.isPasswordHidden.value
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          onPressed: () {
-                            controller.isPasswordHidden.toggle();
-                          },
-                        ),
-                        isError: controller.passwordError.value.isNotEmpty,
-                          errorText: controller.passwordError.value,
-                          validator: (_) => controller.passwordError.value.isEmpty
-                            ? null
-                            : controller.passwordError.value,
-                        placeholder: "••••••••",
-                        placeholderColor: hintTextColor,
-                        
+                    textController: controller.emailController,
+                    prefixIcon: AppSvg(
+                      assetPath: user,
+                      height: 10,
+                      width: 10,
+                      fit: BoxFit.scaleDown,
+                    ),
+                    placeholder: 'admin@iqra.edu.pk',
+                    placeholderColor: hintTextColor,
+                    isError: controller.emailError.value.isNotEmpty,
+                    errorText: controller.emailError.value,
+                    validator: (_) => controller.emailError.value.isEmpty
+                        ? null
+                        : controller.emailError.value,
                   )),
-                  // AppTextField(textController: controller.passwordController, prefixIcon: AppSvg(assetPath: lock, height: 5, width: 5, fit: BoxFit.scaleDown), suffixIcon: AppIconButton(icon: , onPressed: onPressed),),
+
+                  const SizedBox(height: 10),
+
+                  AppTextSemiBold(text: 'Password'),
+                  const SizedBox(height: 3),
+                  Obx(() => AppTextField(
+                    textController: controller.passwordController,
+                    obscureText: controller.isPasswordHidden.value,
+                    prefixIcon: AppSvg(
+                      assetPath: lock,
+                      height: 10,
+                      width: 10,
+                      fit: BoxFit.scaleDown,
+                    ),
+                    suffixIcon: AppIconButton(
+                      icon: controller.isPasswordHidden.value
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      onPressed: () => controller.isPasswordHidden.toggle(),
+                    ),
+                    isError: controller.passwordError.value.isNotEmpty,
+                    errorText: controller.passwordError.value,
+                    validator: (_) => controller.passwordError.value.isEmpty
+                        ? null
+                        : controller.passwordError.value,
+                    placeholder: '••••••••',
+                    placeholderColor: hintTextColor,
+                  )),
+
                   const SizedBox(height: 7),
                   Align(
                     alignment: AlignmentGeometry.centerRight,
                     child: AppTextButton(
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute<void>(builder: (context) => const ForgotPassword()),
+                        MaterialPageRoute(
+                          builder: (_) => const ForgotPassword(),
+                        ),
                       ),
-                      btnText: "Forgot Password?", txtSize: 12,),
+                      btnText: 'Forgot Password?',
+                      txtSize: 12,
+                    ),
                   ),
-                  const SizedBox(height: 7)
+                  const SizedBox(height: 7),
                 ],
               ),
             ),
-          )
+          ),
         ),
       ),
     );
