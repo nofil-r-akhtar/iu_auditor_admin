@@ -6,7 +6,6 @@ import 'package:iu_auditor_admin/components/app_container.dart';
 import 'package:iu_auditor_admin/components/app_dialog.dart';
 import 'package:iu_auditor_admin/components/app_icon_button.dart';
 import 'package:iu_auditor_admin/components/app_text.dart';
-import 'package:iu_auditor_admin/const/enums.dart';
 import 'package:iu_auditor_admin/modal_class/table/table_model.dart';
 import 'package:iu_auditor_admin/modal_class/user/admin_user.dart';
 import 'add_user/add_user.dart';
