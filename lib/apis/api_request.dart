@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:iu_auditor_admin/apis/apis_end_points.dart';
-import 'package:iu_auditor_admin/const/enums.dart';
 import 'package:iu_auditor_admin/apis/connectivty.dart';
+import 'package:iu_auditor_admin/const/enums.dart';
+import 'package:iu_auditor_admin/services/storage_service.dart';
 
 class ApiRequest {
   final CheckConnectivity _connectivity = CheckConnectivity();
@@ -11,8 +12,25 @@ class ApiRequest {
     'Content-Type': 'application/json',
   };
 
-  static void setAuthToken(String token) {
+  /// Set token in memory AND persist it to localStorage
+  static Future<void> setAuthToken(String token) async {
     headers['Authorization'] = 'Bearer $token';
+    await StorageService.saveToken(token);
+  }
+
+  /// Load token from localStorage into memory headers.
+  /// Call this once at app startup before any API calls.
+  static Future<void> loadStoredToken() async {
+    final token = await StorageService.getToken();
+    if (token != null && token.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+  }
+
+  /// Clear token from both memory and localStorage (on logout)
+  static Future<void> clearAuthToken() async {
+    headers.remove('Authorization');
+    await StorageService.clearToken();
   }
 
   Future<Map<String, dynamic>> makeRequest({
@@ -28,19 +46,16 @@ class ApiRequest {
         throw Exception('No internet connection. Please check your network.');
       }
 
-      Map<String, String> defaultHeaders = {
+      final Map<String, String> defaultHeaders = {
         ...ApiRequest.headers,
+        if (headers != null) ...headers,
       };
-
-      if (headers != null) {
-        defaultHeaders.addAll(headers);
-      }
 
       http.Response response;
 
       switch (method) {
         case Request.get:
-          Uri uri = params != null
+          final uri = params != null
               ? Uri.parse(ApisEndPoints.startUrl + url)
                   .replace(queryParameters: params)
               : Uri.parse(ApisEndPoints.startUrl + url);
@@ -69,6 +84,7 @@ class ApiRequest {
             headers: defaultHeaders,
           );
           break;
+
         case Request.patch:
           response = await http.patch(
             Uri.parse(ApisEndPoints.startUrl + url),
@@ -78,19 +94,15 @@ class ApiRequest {
           break;
       }
 
-      // ── Directly decode JSON, no isolate needed ──
       final responseBody = jsonDecode(response.body) as Map<String, dynamic>;
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return responseBody;
       } else if (response.statusCode == 400) {
-        if (responseBody.containsKey('message')) {
-          return {'error': responseBody['message']};
-        } else {
-          throw Exception('Error: Invalid response format for status code 400.');
-        }
+        return {'error': responseBody['message'] ?? 'Bad request'};
       } else {
-        throw Exception('Error: ${response.statusCode}, Response: ${response.body}');
+        throw Exception(
+            'Error: ${response.statusCode}, Response: ${response.body}');
       }
     } catch (e) {
       throw Exception('Error: $e');

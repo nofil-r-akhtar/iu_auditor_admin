@@ -3,13 +3,13 @@ import 'package:iu_auditor_admin/apis/audit/audit_reviews_api.dart';
 import 'package:iu_auditor_admin/apis/new_faculty/new_faculty_apis.dart';
 
 class DashboardController extends GetxController {
-  final NewFacultyApis _teacherApi = NewFacultyApis();
-  final AuditReviewsApi _reviewApi = AuditReviewsApi();
+  final NewFacultyApis  _teacherApi = NewFacultyApis();
+  final AuditReviewsApi _reviewApi  = AuditReviewsApi();
 
   var totalTeachers   = 0.obs;
   var pendingAudits   = 0.obs;
   var completedAudits = 0.obs;
-  var auditScore      = '—'.obs;
+  var auditScore      = '—'.obs;   // no rating column in DB — kept as placeholder
   var isLoading       = false.obs;
 
   RxList<Map<String, dynamic>> activities = <Map<String, dynamic>>[].obs;
@@ -36,28 +36,34 @@ class DashboardController extends GetxController {
 
         completedAudits.value =
             list.where((r) => r.status.toLowerCase() == 'completed').length;
-        pendingAudits.value =
-            list.where((r) => r.status.toLowerCase() == 'pending' ||
-                r.status.toLowerCase() == 'in_progress').length;
 
-        final rated = list.where((r) => r.overallRating != null).toList();
-        if (rated.isNotEmpty) {
-          final avg = rated.fold<double>(0.0, (s, r) => s + r.overallRating!) / rated.length;
-          auditScore.value = '${avg.toStringAsFixed(1)}/5';
+        pendingAudits.value =
+            list.where((r) => r.status.toLowerCase() == 'pending').length;
+
+        // No overallRating in DB — show completed/total ratio instead
+        final total = list.length;
+        if (total > 0) {
+          final pct = ((completedAudits.value / total) * 100).round();
+          auditScore.value = '$pct%';
         }
 
+        // Recent activity — last 5 completed reviews
         activities.assignAll(
-          list.where((r) => r.status.toLowerCase() == 'completed').take(5).map((r) => {
-            'name':   r.auditorName ?? 'Auditor',
-            'action': 'submitted audit for',
-            'target': r.teacherName ?? 'Teacher',
-            'status': 'completed',
-            'time':   _timeAgo(r.createdAt),
-          }).toList(),
+          list
+              .where((r) => r.status.toLowerCase() == 'completed')
+              .take(5)
+              .map((r) => {
+                    'name':   r.auditorName  ?? 'Auditor',
+                    'action': 'submitted audit for',
+                    'target': r.teacherName  ?? 'Teacher',
+                    'status': 'completed',
+                    'time':   _timeAgo(r.createdAt),
+                  })
+              .toList(),
         );
       }
     } catch (_) {
-      // non-fatal — shows zeros on failure
+      // non-fatal — dashboard shows zeros on failure
     } finally {
       isLoading.value = false;
     }
@@ -70,6 +76,8 @@ class DashboardController extends GetxController {
       if (d.inHours > 0)   return '${d.inHours}h ago';
       if (d.inMinutes > 0) return '${d.inMinutes}m ago';
       return 'Just now';
-    } catch (_) { return ''; }
+    } catch (_) {
+      return '';
+    }
   }
 }

@@ -99,10 +99,34 @@ class DashboardView extends StatelessWidget {
           AppTextBold(text: 'Recent Activity'),
           const SizedBox(height: 20),
           Obx(() {
-            if (controller.activities.isEmpty) {
+            // Show spinner only while loading is still in progress
+            if (controller.isLoading.value) {
               return const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16),
                 child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            // Loading done but no completed reviews yet
+            if (controller.activities.isEmpty) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(Icons.inbox_outlined, size: 36, color: Colors.grey),
+                      SizedBox(height: 10),
+                      Text(
+                        'No recent activity yet.',
+                        style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Completed reviews will appear here.',
+                        style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
               );
             }
             return Column(
@@ -235,7 +259,7 @@ class _StatData {
 class _StatCard extends StatelessWidget {
   final _StatData data;
   final double width;
-  const _StatCard({required this.data, required this.width});
+  const _StatCard({required this.data, required this.width, super.key});
 
   @override
   Widget build(BuildContext context) {

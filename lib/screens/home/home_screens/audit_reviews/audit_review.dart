@@ -3,10 +3,11 @@ import 'package:get/get.dart';
 import 'package:iu_auditor_admin/app_theme/colors.dart';
 import 'package:iu_auditor_admin/components/app_button.dart';
 import 'package:iu_auditor_admin/components/app_container.dart';
+import 'package:iu_auditor_admin/components/app_icon_button.dart';
 import 'package:iu_auditor_admin/components/app_text.dart';
 import 'package:iu_auditor_admin/components/home_components/home_app_bar.dart';
 import 'package:iu_auditor_admin/components/home_components/screen_search_bar.dart';
-import 'package:iu_auditor_admin/screens/home/home_screens/audit_reviews/audit_reviews_controller.dart';
+import 'audit_reviews_controller.dart';
 
 class AuditReview extends StatelessWidget {
   const AuditReview({super.key});
@@ -14,7 +15,7 @@ class AuditReview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(AuditReviewController());
-    final isMobile = MediaQuery.of(context).size.width < 600;
+    final isMobile   = MediaQuery.of(context).size.width < 600;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -27,8 +28,10 @@ class AuditReview extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Responsive header ──────────────────────────────────
+
+            // ── Header ────────────────────────────────────────
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
                   child: Column(
@@ -39,7 +42,7 @@ class AuditReview extends StatelessWidget {
                         fontSize: isMobile ? 18 : 22,
                       ),
                       AppTextRegular(
-                        text: 'View feedback submitted by senior lecturers.',
+                        text: 'Assign and track audit reviews for teachers.',
                         color: descriptiveColor,
                         fontSize: 13,
                       ),
@@ -47,48 +50,27 @@ class AuditReview extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
+                // ── Assign Review button (primary action) ─────
                 AppButton(
-                  onPress: () {},
-                  bgColor: whiteColor,
-                  txtColor: navyBlueColor,
-                  border: Border.all(color: iconColor.withOpacity(0.3)),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  icon: const Icon(Icons.file_download_outlined, color: navyBlueColor, size: 18),
-                  txt: isMobile ? '' : 'Export Report',
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 10),
+                  onPress: () => controller.openAssignDialog(),
+                  icon: const Icon(Icons.assignment_add,
+                      color: whiteColor, size: 18),
+                  txt: isMobile ? '' : 'Assign Review',
                 ),
               ],
             ),
             const SizedBox(height: 20),
 
-            // ── Search + Filter ────────────────────────────────────
-            Row(
-              children: [
-                Expanded(
-                  child: ScreenSearchBar(
-                    searchFieldController: controller.searchController,
-                    searchFieldDummyText: 'Search by teacher or auditor...',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                AppContainer(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  bgColor: whiteColor,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.filter_list, color: iconColor, size: 20),
-                      if (!isMobile) ...[
-                        const SizedBox(width: 8),
-                        AppTextMedium(text: 'Filter', color: descriptiveColor),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
+            // ── Search bar ────────────────────────────────────
+            ScreenSearchBar(
+              searchFieldController: controller.searchController,
+              searchFieldDummyText: 'Search by teacher or auditor...',
             ),
             const SizedBox(height: 20),
 
-            // ── Review cards grid ──────────────────────────────────
+            // ── Review cards ──────────────────────────────────
             Obx(() {
               if (controller.isLoading.value) {
                 return const Center(
@@ -105,36 +87,47 @@ class AuditReview extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   padding: const EdgeInsets.all(40),
                   child: Center(
-                    child: AppTextRegular(
-                      text: 'No reviews found.',
-                      color: descriptiveColor,
-                    ),
+                    child: Column(children: [
+                      const Icon(Icons.assignment_outlined,
+                          size: 40, color: Colors.grey),
+                      const SizedBox(height: 12),
+                      AppTextRegular(
+                        text: 'No audit reviews yet.',
+                        color: descriptiveColor,
+                      ),
+                      const SizedBox(height: 6),
+                      AppTextRegular(
+                        text: 'Tap "Assign Review" to create one.',
+                        color: iconColor,
+                        fontSize: 12,
+                      ),
+                    ]),
                   ),
                 );
               }
 
-              return LayoutBuilder(
-                builder: (ctx, constraints) {
-                  final crossCount = constraints.maxWidth > 1200
-                      ? 3
-                      : constraints.maxWidth > 700
-                          ? 2
-                          : 1;
-                  return GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossCount,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      mainAxisExtent: 270,
-                    ),
-                    itemCount: controller.reviews.length,
-                    itemBuilder: (ctx, i) =>
-                        _ReviewCard(data: controller.reviews[i]),
-                  );
-                },
-              );
+              return LayoutBuilder(builder: (ctx, constraints) {
+                final crossCount = constraints.maxWidth > 1200
+                    ? 3
+                    : constraints.maxWidth > 700
+                        ? 2
+                        : 1;
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossCount,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    mainAxisExtent: 260,
+                  ),
+                  itemCount: controller.reviews.length,
+                  itemBuilder: (ctx, i) => _ReviewCard(
+                    data: controller.reviews[i],
+                    controller: controller,
+                  ),
+                );
+              });
             }),
           ],
         ),
@@ -145,23 +138,21 @@ class AuditReview extends StatelessWidget {
 
 class _ReviewCard extends StatelessWidget {
   final Map<String, dynamic> data;
-  const _ReviewCard({required this.data});
+  final AuditReviewController controller;
+  const _ReviewCard({required this.data, required this.controller});
 
-  Color _statusBg(String s) {
-    if (s == 'Completed') return const Color(0xFFE8F5E9);
-    if (s == 'In Progress') return const Color(0xFFE3F2FD);
-    return const Color(0xFFFFF3E0);
-  }
+  Color _statusBg(String s) => s == 'Completed'
+      ? const Color(0xFFE8F5E9)
+      : const Color(0xFFFFF3E0);
 
-  Color _statusText(String s) {
-    if (s == 'Completed') return const Color(0xFF2E7D32);
-    if (s == 'In Progress') return const Color(0xFF1565C0);
-    return const Color(0xFFE65100);
-  }
+  Color _statusText(String s) => s == 'Completed'
+      ? const Color(0xFF2E7D32)
+      : const Color(0xFFE65100);
 
   @override
   Widget build(BuildContext context) {
-    final status = data['status'] ?? '';
+    final status = data['status'] as String? ?? '';
+
     return AppContainer(
       bgColor: whiteColor,
       borderRadius: BorderRadius.circular(16),
@@ -169,17 +160,17 @@ class _ReviewCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+
+          // ── Teacher name + actions row ─────────────────────
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Flexible(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AppTextSemiBold(
-                      text: data['teacher'] ?? '',
-                      fontSize: 15,
-                    ),
+                        text: data['teacher'] ?? '', fontSize: 15),
                     AppTextRegular(
                       text: data['department'] ?? '',
                       fontSize: 12,
@@ -188,37 +179,34 @@ class _ReviewCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
-              AppContainer(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                bgColor: const Color(0xFFFEF3C7),
-                borderRadius: BorderRadius.circular(8),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.star, color: Colors.orange, size: 13),
-                    const SizedBox(width: 3),
-                    AppTextBold(
-                      text: data['rating'] ?? '—',
-                      color: Colors.orange,
-                      fontSize: 12,
-                    ),
-                  ],
-                ),
+              // ── Delete icon ──────────────────────────────
+              AppIconButton(
+                icon: Icons.delete_outline,
+                iconColor: redColor,
+                size: 20,
+                onPressed: () => controller.confirmDelete(data),
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          _row('Auditor', data['auditor'] ?? '—'),
-          const SizedBox(height: 8),
-          _row('Date', data['date'] ?? '—'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
+
+          // ── Detail rows ────────────────────────────────────
+          _row('Form',    data['formTitle'] ?? '—'),
+          const SizedBox(height: 7),
+          _row('Auditor', data['auditor']   ?? '—'),
+          const SizedBox(height: 7),
+          _row('Date',    data['date']      ?? '—'),
+          const SizedBox(height: 7),
+
+          // ── Status badge ───────────────────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              AppTextRegular(text: 'Status', color: iconColor, fontSize: 13),
+              AppTextRegular(
+                  text: 'Status', color: iconColor, fontSize: 13),
               AppContainer(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8, vertical: 3),
                 borderRadius: BorderRadius.circular(20),
                 bgColor: _statusBg(status),
                 child: AppTextMedium(
@@ -229,13 +217,27 @@ class _ReviewCard extends StatelessWidget {
               ),
             ],
           ),
+
           const Spacer(),
+
+          // ── View Full Report button ─────────────────────────
           AppButton(
-            onPress: () {},
+            onPress: () => controller.openFullReport(
+                data['id'] as String),
             bgColor: const Color(0xFFEFF6FF),
             txtColor: primaryColor,
             alignment: Alignment.center,
-            icon: const Icon(Icons.visibility_outlined, color: primaryColor, size: 16),
+            icon: controller.isReportLoading.value
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: primaryColor,
+                    ),
+                  )
+                : const Icon(Icons.visibility_outlined,
+                    color: primaryColor, size: 16),
             txt: 'View Full Report',
           ),
         ],
@@ -248,7 +250,14 @@ class _ReviewCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         AppTextRegular(text: label, color: iconColor, fontSize: 13),
-        AppTextMedium(text: value, color: navyBlueColor, fontSize: 13),
+        Flexible(
+          child: AppTextMedium(
+            text: value,
+            color: navyBlueColor,
+            fontSize: 13,
+            textAlign: TextAlign.right,
+          ),
+        ),
       ],
     );
   }

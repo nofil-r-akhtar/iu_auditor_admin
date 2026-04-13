@@ -63,3 +63,21 @@ enum Department {
     return null;
   }
 }
+
+enum QuestionType {
+  rating('rating', 'Rating Scale (1-5)'),
+  paragraph('paragraph', 'Text Feedback'),
+  mcq('mcq', 'Multiple Choice'),
+  yesNo('yes_no', 'Yes / No');
+
+  const QuestionType(this.apiValue, this.displayLabel);
+  final String apiValue;      // sent to API: 'rating', 'paragraph', 'mcq', 'yes_no'
+  final String displayLabel;  // shown in UI dropdown
+
+  static QuestionType fromApiValue(String value) {
+    return QuestionType.values.firstWhere(
+      (t) => t.apiValue == value,
+      orElse: () => QuestionType.rating,
+    );
+  }
+}
