@@ -259,7 +259,7 @@ class _StatData {
 class _StatCard extends StatelessWidget {
   final _StatData data;
   final double width;
-  const _StatCard({required this.data, required this.width, super.key});
+  const _StatCard({required this.data, required this.width});
 
   @override
   Widget build(BuildContext context) {

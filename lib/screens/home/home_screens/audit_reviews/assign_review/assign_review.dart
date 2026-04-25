@@ -75,6 +75,75 @@ class AssignReview extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
+          // ── Senior Lecturer Dropdown ───────────────────────
+          _field(context, 'Assign To (Senior Lecturer)',
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: c.lecturerError.value.isNotEmpty
+                      ? Border.all(color: Colors.red, width: 1.2) : null,
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    value: c.selectedLecturer.value?.id,
+                    hint: AppTextRegular(
+                        text: c.selectedTeacher.value == null
+                            ? 'Select a teacher first'
+                            : c.filteredLecturers.isEmpty
+                                ? 'No senior lecturer in this department'
+                                : 'Select senior lecturer',
+                        color: hintTextColor, fontSize: 13),
+                    items: c.filteredLecturers.map((l) => DropdownMenuItem(
+                      value: l.id,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AppTextMedium(text: l.name, fontSize: 13),
+                          AppTextRegular(
+                              text: l.email,
+                              color: descriptiveColor, fontSize: 11),
+                        ],
+                      ),
+                    )).toList(),
+                    onChanged: c.filteredLecturers.isEmpty ? null : (id) {
+                      c.selectedLecturer.value =
+                          c.filteredLecturers.firstWhereOrNull((l) => l.id == id);
+                      c.lecturerError.value = '';
+                    },
+                  ),
+                ),
+              ),
+              if (c.lecturerError.value.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4, left: 4),
+                  child: Text(c.lecturerError.value,
+                      style: const TextStyle(color: Colors.red, fontSize: 11)),
+                ),
+              if (c.selectedTeacher.value != null &&
+                  c.filteredLecturers.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6, left: 4),
+                  child: Row(children: [
+                    const Icon(Icons.warning_amber_rounded,
+                        size: 13, color: Color(0xFFD97706)),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: AppTextRegular(
+                        text: 'No senior lecturer found for ${c.selectedTeacher.value!.department}. Please add one first.',
+                        color: const Color(0xFFD97706), fontSize: 11,
+                      ),
+                    ),
+                  ]),
+                ),
+            ]),
+          ),
+          const SizedBox(height: 16),
+
           // ── Audit Form Dropdown ────────────────────────────
           _field(context, 'Audit Form',
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -124,7 +193,6 @@ class AssignReview extends StatelessWidget {
                   child: Text(c.formError.value,
                       style: const TextStyle(color: Colors.red, fontSize: 11)),
                 ),
-              // Helper — form auto-filtered by teacher's department
               if (c.selectedTeacher.value != null)
                 Padding(
                   padding: const EdgeInsets.only(top: 6, left: 4),

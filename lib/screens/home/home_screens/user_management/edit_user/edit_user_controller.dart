@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:iu_auditor_admin/apis/admin/admin_api.dart';
 import 'package:iu_auditor_admin/const/enums.dart';
 import 'package:iu_auditor_admin/modal_class/user/admin_user.dart';
-import 'package:iu_auditor_admin/screens/home/home_screens/user_management/add_user/add_user_controller.dart';
 
 class EditUserController extends GetxController {
   final AdminApi _api = AdminApi();

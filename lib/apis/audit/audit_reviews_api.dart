@@ -31,14 +31,16 @@ class AuditReviewsApi {
   Future<Map<String, dynamic>> createReview({
     required String teacherId,
     required String formId,
+    required String reviewedBy,   // 🔑 senior lecturer id (REQUIRED)
     String? notes,
   }) async {
     return await _request.makeRequest(
       url: _api.auditReviews,
       method: Request.post,
       params: {
-        'teacher_id': teacherId,
-        'form_id':    formId,
+        'teacher_id':  teacherId,
+        'form_id':     formId,
+        'reviewed_by': reviewedBy,
         if (notes != null && notes.isNotEmpty) 'notes': notes,
       },
     );
