@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:get/get.dart';
+import 'package:iu_auditor_admin/routes/app_routes.dart';
 import 'package:http/http.dart' as http;
 import 'package:iu_auditor_admin/apis/apis_end_points.dart';
 import 'package:iu_auditor_admin/apis/connectivty.dart';
@@ -98,6 +100,19 @@ class ApiRequest {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return responseBody;
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        // Token expired or invalid — clear it and bounce to login.
+        await clearAuthToken();
+        // Avoid double-redirect if we're already on the login page.
+        if (Get.currentRoute != AppRoutes.login) {
+          Get.offAllNamed(AppRoutes.login);
+          Get.snackbar(
+            'Session expired',
+            'Please log in again.',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+        throw Exception('Session expired');
       } else if (response.statusCode == 400) {
         return {'error': responseBody['message'] ?? 'Bad request'};
       } else {

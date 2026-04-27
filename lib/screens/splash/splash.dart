@@ -5,6 +5,7 @@ import 'package:iu_auditor_admin/app_theme/colors.dart';
 import 'package:iu_auditor_admin/components/app_image.dart';
 import 'package:iu_auditor_admin/const/assets.dart';
 import 'package:iu_auditor_admin/routes/app_routes.dart';
+import 'package:iu_auditor_admin/apis/api_request.dart';
 import 'package:iu_auditor_admin/services/storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -42,9 +43,15 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(milliseconds: 600));
 
     // Token is ALREADY loaded into memory by main() before runApp.
-    // We only need to check whether a token EXISTS to decide where to go.
+    // Check if it's still valid (exists AND not expired).
     _setStatus('Checking session...', 0.3);
-    final loggedIn = await StorageService.isLoggedIn();
+    final loggedIn = await StorageService.hasValidToken();
+
+    // If token is gone or expired, also clear the in-memory header
+    // so stale Authorization isn't sent on the next API call.
+    if (!loggedIn) {
+      await ApiRequest.clearAuthToken();
+    }
 
     // Wake up the backend while we're here
     _setStatus('Connecting to server...', 0.5);
